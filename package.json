@@ -4,6 +4,7 @@
   "description": "A CLI app for accessing, updating, and deleting infomation on a company's employee database.",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
