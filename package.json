@@ -1,0 +1,24 @@
+{
+  "name": "employee_cms",
+  "version": "1.0.0",
+  "description": "A CLI app for accessing, updating, and deleting infomation on a company's employee database.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emijoha/Employee_CMS.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/emijoha/Employee_CMS/issues"
+  },
+  "homepage": "https://github.com/emijoha/Employee_CMS#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "inquirer": "^7.1.0",
+    "mysql": "^2.18.1"
+  }
+}
