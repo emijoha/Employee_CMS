@@ -1,7 +1,15 @@
+// ----------------------------------------------------------------------------------------------------------------
+// REQUIRE NEEDED PACKAGES/MODULES
+// ----------------------------------------------------------------------------------------------------------------
+
 const inquirer = require("inquirer");
 // private to protect mysql password
 const connection = require("./private/mysql");
 const cTable = require('console.table');
+
+// ----------------------------------------------------------------------------------------------------------------
+// CONNECT TO DATABASE and START CLI APP
+// ----------------------------------------------------------------------------------------------------------------
 
 connection.connect(function(err) {
     if (err) throw err;
@@ -9,6 +17,10 @@ connection.connect(function(err) {
     console.log("Connected to company_DB");
     startAction();
 });
+
+// ----------------------------------------------------------------------------------------------------------------
+// GENERAL ACTION FUNCTIONS
+// ----------------------------------------------------------------------------------------------------------------
 
 // Function to initiate CLI app, runs once connection to database is successful
 function startAction() {
@@ -62,7 +74,7 @@ function employeeAction() {
                     break;
     
                 case "Update Employee Role":
-                    //updateRole;
+                    // updateEmpRole();
                     console.log("Employee role updated");
                     break;
     
@@ -111,12 +123,12 @@ function departmentAction() {
         }).then(function(answer) {
             switch (answer.departmentAction) {
                 case "View All Departments":
-                    // viewRoles();
+                    // viewDepartments();
                     console.log("'View All Departments' selected");
                     break;
     
                 case "Add Department":
-                    // addRole();
+                    // addDepartment();
                     console.log("Department added")
                     break;
     
@@ -125,4 +137,30 @@ function departmentAction() {
                     break;
                 }
         });
-}
+};
+
+// ----------------------------------------------------------------------------------------------------------------
+// EMPLOYEE QUERY FUNCTIONS
+// ----------------------------------------------------------------------------------------------------------------
+
+// viewEmployees();
+
+// addEmployee();
+
+// updateEmpRole();
+
+// ----------------------------------------------------------------------------------------------------------------
+// ROLE QUERY FUNCTIONS
+// ----------------------------------------------------------------------------------------------------------------
+
+// viewRoles()
+
+// addRole();
+
+// ----------------------------------------------------------------------------------------------------------------
+// DEPARTMENT QUERY FUNCTIONS
+// ----------------------------------------------------------------------------------------------------------------
+
+// viewDepartments();
+
+// addDepartment();
