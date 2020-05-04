@@ -3,18 +3,28 @@
 // ----------------------------------------------------------------------------------------------------------------
 
 const inquirer = require("inquirer");
-// private to protect mysql password
-const connection = require("./private/mysql");
-const cTable = require('console.table');
+const mysql = require("mysql");
+const cTable = require("console.table");
+
+// private password
+const password = require("./private/mysqlPassword");
 
 // ----------------------------------------------------------------------------------------------------------------
 // CONNECT TO DATABASE and START CLI APP
 // ----------------------------------------------------------------------------------------------------------------
 
+const connection = mysql.createConnection({
+    host: "localhost",
+    port:3306,
+    user: "root",
+    password: password,
+    database: "company_DB"
+});
+
 connection.connect(function(err) {
     if (err) throw err;
     
-    console.log("Connected to company_DB");
+    console.log("Connected to Company_DB");
     startAction();
 });
 
@@ -64,7 +74,7 @@ function employeeAction() {
         }).then(function(answer) {
             switch (answer.employeeAction) {
                 case "View All Employees":
-                    // viewEmployees();
+                    viewEmployees();
                     console.log("'View All Employees' selected");
                     break;
     
@@ -144,6 +154,12 @@ function departmentAction() {
 // ----------------------------------------------------------------------------------------------------------------
 
 // viewEmployees();
+function viewEmployees() {
+    let query = "SELECT * FROM employees";
+    connection.query(query, function(err, res) {
+        console.table(res);
+    })
+};
 
 // addEmployee();
 
