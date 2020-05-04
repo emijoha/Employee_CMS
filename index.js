@@ -78,7 +78,7 @@ function employeeAction(msgString) {
             switch (answer.employeeAction) {
                 case "View All Employees":
                     viewEmployees();
-                    console.log("\nAll Employees\n");
+                    // console.log("\nAll Employees\n");
                     break;
     
                 case "Add Employee":
@@ -159,7 +159,7 @@ function departmentAction(msgString) {
 // viewEmployees();
 function viewEmployees() {
     connection.query(query.allEmp, function(err, res) {
-        console.table(res);
+        console.table("\nAll Employees", res);
         employeeAction("What else would you like to do with 'Employees'?");
     });
 };
