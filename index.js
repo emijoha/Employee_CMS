@@ -9,6 +9,9 @@ const cTable = require("console.table");
 // private password
 const password = require("./private/mysqlPassword");
 
+// database query types
+const query = require("./lib/query");
+
 // ----------------------------------------------------------------------------------------------------------------
 // CONNECT TO DATABASE and START CLI APP
 // ----------------------------------------------------------------------------------------------------------------
@@ -24,8 +27,8 @@ const connection = mysql.createConnection({
 connection.connect(function(err) {
     if (err) throw err;
     
-    console.log("Connected to Company_DB");
-    startAction();
+    console.log("Connected to Company_DB\n");
+    startAction("Welcome! What would you like to do?");
 });
 
 // ----------------------------------------------------------------------------------------------------------------
@@ -33,30 +36,30 @@ connection.connect(function(err) {
 // ----------------------------------------------------------------------------------------------------------------
 
 // Function to initiate CLI app, runs once connection to database is successful
-function startAction() {
+function startAction(msgString) {
     inquirer
         .prompt({
             // Get user's action choice by category or exit
             name: "startAction",
             type: "list",
-            message: "What would you like to do?",
+            message: msgString,
             choices: ["Manage 'Employees'", "Manage 'Roles'", "Manage 'Departments'", "Exit"]
         }).then(function(answer) {
             switch (answer.startAction) {
             case "Manage 'Employees'":
-                employeeAction();
+                employeeAction("What would you like to do with 'Employees'?");
                 break;
 
             case "Manage 'Roles'":
-                roleAction();
+                roleAction("What would you like to do with 'Roles'?");
                 break;
 
             case "Manage 'Departments'":
-                departmentAction();
+                departmentAction("What would you like to do with 'Departments'?");
                 break;
 
             case "Exit":
-                console.log("Goodbye!")
+                console.log("\nGoodbye!")
                 connection.end();
                 break;
             }
@@ -64,18 +67,18 @@ function startAction() {
 };
 
 // Function to get user's action for employee data
-function employeeAction() {
+function employeeAction(msgString) {
     inquirer
         .prompt({
             name: "employeeAction",
             type: "list",
-            message: "What would you like to do with 'Employees'?",
+            message: msgString,
             choices: ["View All Employees", "Add Employee", "Update Employee Role", "Exit 'Employees'"]
         }).then(function(answer) {
             switch (answer.employeeAction) {
                 case "View All Employees":
                     viewEmployees();
-                    console.log("'View All Employees' selected");
+                    console.log("\nAll Employees\n");
                     break;
     
                 case "Add Employee":
@@ -89,19 +92,19 @@ function employeeAction() {
                     break;
     
                 case "Exit 'Employees'":
-                    startAction();
+                    startAction("What would you like to do now?");
                     break;
                 }
         });
 };
 
 // Function to get user's action for role data
-function roleAction() {
+function roleAction(msgString) {
     inquirer
         .prompt({
             name: "roleAction",
             type: "list",
-            message: "What would you like to do with 'Roles'?",
+            message: msgString,
             choices: ["View All Roles", "Add Role", "Exit 'Roles'"]
         }).then(function(answer) {
             switch (answer.roleAction) {
@@ -116,19 +119,19 @@ function roleAction() {
                     break;
     
                 case "Exit 'Roles'":
-                    startAction();
+                    startAction("What would you like to do now?");
                     break;
                 }
         });
 }
 
 // Function to get user's action for department data
-function departmentAction() {
+function departmentAction(msgString) {
     inquirer
         .prompt({
             name: "departmentAction",
             type: "list",
-            message: "What would you like to do with 'Departments'?",
+            message: msgString,
             choices: ["View All Departments", "Add Department", "Exit 'Departments'"]
         }).then(function(answer) {
             switch (answer.departmentAction) {
@@ -143,7 +146,7 @@ function departmentAction() {
                     break;
     
                 case "Exit 'Departments'":
-                    startAction();
+                    startAction("What would you like to do now?");
                     break;
                 }
         });
@@ -155,10 +158,10 @@ function departmentAction() {
 
 // viewEmployees();
 function viewEmployees() {
-    let query = "SELECT * FROM employees";
-    connection.query(query, function(err, res) {
+    connection.query(query.allEmp, function(err, res) {
         console.table(res);
-    })
+        employeeAction("What else would you like to do with 'Employees'?");
+    });
 };
 
 // addEmployee();
