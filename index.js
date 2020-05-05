@@ -98,8 +98,7 @@ function employeeAction(msgString) {
                 break;
 
             case "Update Employee Role":
-                // updateEmpRole();
-                console.log("Employee role updated");
+                updateEmpRole();
                 break;
 
             case "Exit 'Employees'":
@@ -195,11 +194,11 @@ function addEmployee() {
         // make an array containing role objects with only role title
         let rolesArr = res1.map(obj => obj.title);
 
-        // Query for all employees as managers
-        connection.query(query.managers, function(err, res2) {
+        // Query for all employees
+        connection.query(query.employees, function(err, res2) {
 
-            // make an array containing manager objects with only manager first and last names
-            let managersArr = res2.map(obj => obj.manager);
+            // make a managers array containing employee objects with only employee first and last names
+            let managersArr = res2.map(obj => obj.employee);
 
             // Now we run inquirer, using the above arrays to plug in as answer list choices in the prompts below
             inquirer
@@ -240,22 +239,22 @@ function addEmployee() {
                     let lastName = answers.lastName;
 
                     // Go through query response '1' (res1) again to find the object where the role title is equal to the role answer choice
-                    let role = res1.find(obj => obj.title === answers.role);
+                    let selectedRole = res1.find(obj => obj.title === answers.role);
 
-                    let manager;
+                    let managerID;
                     // Set the manager variable equal to NULL -or- equal to id of selected manager
                     if (answers.confirmManager === false) {
-                        manager = null;
+                        managerID = null;
                     } else {
-                        // go through query response '2' (res2) again to find the object where manager name is equal to manager answer choice 
-                        let managerID = res2.find(obj => obj.manager === answers.manager);
+                        // go through query response '2' (res2) again to find the object where employee name is equal to manager answer choice 
+                        let selectedManager = res2.find(obj => obj.employee === answers.manager);
                         // Assign 'id' value of that object to 'manager' variable
-                        manager = managerID.id;
+                        managerID = selectedManager.id;
                     };
 
                     // Query to INSERT new employee values into employees data table
-                    // 'id' property value of 'role' object variable is specified when passed into query method 'addEmployee()'
-                    connection.query(query.addEmployee(firstName, lastName, role.id, manager), function(err, res3) {
+                    // 'id' property value of 'selectedRole' object variable is specified when passed into query method 'addEmployee()'
+                    connection.query(query.addEmployee(firstName, lastName, selectedRole.id, managerID), function(err, res3) {
 
                         console.log(`\n${firstName} ${lastName} was added to 'Employees'!`);
                         // Render updated employees table, and restart 'Employees' action prompts
@@ -268,6 +267,56 @@ function addEmployee() {
 };
 
 // updateEmpRole();
+function updateEmpRole() {
+
+    // Query for all employees
+    connection.query(query.employees, function(err, res1) {
+
+        // make an array containing employee objects with only employee names
+        let employeesArr = res1.map(obj => obj.employee);
+
+        // Query for all roles
+        connection.query(query.roles, function(err, res2) {
+
+            // make a roles array containing role objects with only role titles
+            let rolesArr = res2.map(obj => obj.title);
+
+            // Now we run inquirer, using the above arrays to plug in as answer list choices in the prompts below
+            inquirer
+                .prompt([
+                    {
+                        name: "employee",
+                        type: "list",
+                        message: "Which EMPLOYEE'S role would you like to update?",
+                        choices: employeesArr
+                    }, 
+                    {
+                        name: "newRole",
+                        type: "list",
+                        message: "Which ROLE would you like to assign to this employee?",
+                        choices: rolesArr
+                    }
+                ]).then(function(answers) {
+
+                    // Go through query response '1' (res1) again to find the object where the employee is equal to the employee answer choice
+                    let selectedEmp = res1.find(obj => obj.employee === answers.employee);
+
+                    // Go through query response '2' (res2) again to find the object where the role title is equal to the role answer choice
+                    let selectedRole = res2.find(obj => obj.title === answers.newRole);
+
+                    // Query to UPDATE selected employee's role in employees data table
+                    // 'id' property value of 'selectedRole' and 'selectedEmp' object variables is specified when passed into query method 'updateEmpRole()'
+                    connection.query(query.updateEmpRole(selectedRole.id, selectedEmp.id), function(err, res3) {
+
+                        console.log(`\n${answers.employee}'s role was changed to '${answers.newRole}'!`);
+                        // Render updated employees table, and restart 'Employees' action prompts
+                        viewEmployees();
+
+                    });
+                });
+        });
+    });
+};
 
 // ----------------------------------------------------------------------------------------------------------------
 // ROLE QUERY FUNCTIONS
@@ -318,11 +367,11 @@ function addRole() {
                 let title = answers.title;
                 let salary = answers.salary;
                 // Go through query response '1' (res1) again to find the object where the department name is equal to the department answer choice
-                let department = res1.find(obj => obj.name === answers.department);
+                let selectedDept = res1.find(obj => obj.name === answers.department);
 
                 // Query to INSERT new role values into roles data table
-                // 'id' propery value of 'department' object variable is specified when passed into query method 'addRole()'
-                connection.query(query.addRole(title, salary, department.id), function(err, res2) {
+                // 'id' propery value of 'selectedDept' object variable is specified when passed into query method 'addRole()'
+                connection.query(query.addRole(title, salary, selectedDept.id), function(err, res2) {
 
                     console.log(`\n${title} was added to 'Roles'!`);
                     // Render updated roles table, and restart 'Roles' action prompts
