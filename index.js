@@ -81,8 +81,7 @@ function employeeAction(msgString) {
                     break;
     
                 case "Add Employee":
-                    // addEmployee();
-                    console.log("Employee Added");
+                    addEmployee();
                     break;
     
                 case "Update Employee Role":
@@ -161,7 +160,79 @@ function viewEmployees() {
     });
 };
 
-// addEmployee();
+// addEmployee(); 
+// TO DO: Simplify this code!!!!!
+function addEmployee() {
+
+    // Query for all roles
+    connection.query(query.roles, function(err, res1) {
+
+        // make an array containing role objects with id and title
+        let rolesArr = res1.map(obj => obj.title);
+
+        // Query for all employees as managers
+        connection.query(query.managers, function(err, res2) {
+
+            // make an array containing manager objects with employee id and first and last names
+            let managersArr = res2.map(obj => obj.manager);
+
+            // Now we run inquirer, using the above arrays to plug in as answer list choices in the prompts below
+            inquirer
+                .prompt([
+                    {
+                        name: "firstName",
+                        type: "input",
+                        message: "What is the employee's FIRST NAME?"
+                    }, {
+                        name: "lastName",
+                        type: "input",
+                        message: "What is the employee's LAST NAME?"
+                    }, {
+                        name: "role",
+                        type: "list",
+                        message: "What is the employee's ROLE?",
+                        choices: rolesArr
+                    }, {
+                        name: "confirmManager",
+                        type: "confirm",
+                        message: "Would you like assign a MANAGER for this employee?"
+                    }, {
+                        name: "manager",
+                        type: "list",
+                        message: "Who would you like to assign as their MANAGER?",
+                        choices: managersArr,
+                        // Only if manager is confirmed TRUE does this question get asked
+                        when: answers => answers.confirmManager === true
+                    }
+                ]).then(function(answers) {
+
+                    // Assign answers' inputs to variables
+                    let firstName = answers.firstName;
+                    let lastName = answers.lastName;
+                    // Go through query response '1' (res1) again to find the object where the role title is equal to the role answer choice
+                    let role = res1.find(obj => obj.title === answers.role);
+                    let manager;
+                        // Set the manager variable equal to NULL -or- equal to id of selected manager
+                        if (answers.confirmManager === false) {
+                            manager = null;
+                        } else {
+                            // go through query response '2' (res2) again to find the object where manager name is equal to manager answer choice 
+                            let managerID = res2.find(obj => obj.manager === answers.manager);
+                            // Assign 'id' value of that object to 'manager' variable
+                            manager = managerID.id;
+                        };
+
+                    // Last query, to INSERT new employee values into employees data table
+                    // 'id' value of 'role' object variable is specified when passed into query method 'addEmployee()'
+                    connection.query(query.addEmployee(firstName, lastName, role.id, manager), function(err, res3) {
+                        console.log(`\n${firstName} ${lastName} was added to 'Employees'!`);
+                        // Render updated employees table, and restart 'Employees' action prompts
+                        viewEmployees();
+                    });
+                });
+        });
+    });
+};
 
 // updateEmpRole();
 
