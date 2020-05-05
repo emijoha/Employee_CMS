@@ -78,7 +78,6 @@ function employeeAction(msgString) {
             switch (answer.employeeAction) {
                 case "View All Employees":
                     viewEmployees();
-                    // console.log("\nAll Employees\n");
                     break;
     
                 case "Add Employee":
@@ -109,8 +108,7 @@ function roleAction(msgString) {
         }).then(function(answer) {
             switch (answer.roleAction) {
                 case "View All Roles":
-                    // viewRoles();
-                    console.log("'View All Roles' selected");
+                    viewRoles();
                     break;
     
                 case "Add Role":
@@ -136,8 +134,7 @@ function departmentAction(msgString) {
         }).then(function(answer) {
             switch (answer.departmentAction) {
                 case "View All Departments":
-                    // viewDepartments();
-                    console.log("'View All Departments' selected");
+                    viewDepartments();
                     break;
     
                 case "Add Department":
@@ -158,7 +155,7 @@ function departmentAction(msgString) {
 
 // viewEmployees();
 function viewEmployees() {
-    connection.query(query.allEmp, function(err, res) {
+    connection.query(query.allEmployees, function(err, res) {
         console.table("\nAll Employees", res);
         employeeAction("What else would you like to do with 'Employees'?");
     });
@@ -173,6 +170,12 @@ function viewEmployees() {
 // ----------------------------------------------------------------------------------------------------------------
 
 // viewRoles()
+function viewRoles() {
+    connection.query(query.allRoles, function(err, res) {
+        console.table("\nAll Roles", res);
+        roleAction("What else would you like to do with 'Roles'?");
+    });
+};
 
 // addRole();
 
@@ -181,5 +184,11 @@ function viewEmployees() {
 // ----------------------------------------------------------------------------------------------------------------
 
 // viewDepartments();
+function viewDepartments() {
+    connection.query(query.allDepartments, function(err, res) {
+        console.table("\nAll Departments", res);
+        departmentAction("What else would you like to do with 'Departments'?");
+    });
+};
 
 // addDepartment();
