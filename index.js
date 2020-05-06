@@ -43,15 +43,15 @@ connection.connect(function(err) {
 function startAction(msgString) {
 
     inquirer
-        .prompt({
-
-            // Get user's action choice by category or exit
-            name: "startAction",
-            type: "list",
-            message: msgString,
-            choices: ["Manage 'Employees'", "Manage 'Roles'", "Manage 'Departments'", "Exit"]
-
-        }).then(function(answer) {
+        .prompt(
+            {
+                // Get user's action choice by category or exit
+                name: "startAction",
+                type: "list",
+                message: msgString,
+                choices: ["Manage 'Employees'", "Manage 'Roles'", "Manage 'Departments'", "Exit"]
+            }
+        ).then(function(answer) {
 
             switch (answer.startAction) {
             case "Manage 'Employees'":
@@ -79,16 +79,16 @@ function startAction(msgString) {
 function employeeAction(msgString) {
 
     inquirer
-        .prompt({
+        .prompt(
+            {
+                name: "employeeAction",
+                type: "list",
+                message: msgString,
+                choices: ["View All Employees", "Add Employee", "Update Employee", "Exit 'Employees'"]
+            }
+        ).then(function(answer1) {
 
-            name: "employeeAction",
-            type: "list",
-            message: msgString,
-            choices: ["View All Employees", "Add Employee", "Update Employee Role", "Exit 'Employees'"]
-
-        }).then(function(answer) {
-
-            switch (answer.employeeAction) {
+            switch (answer1.employeeAction) {
             case "View All Employees":
                 viewEmployees();
                 break;
@@ -97,9 +97,31 @@ function employeeAction(msgString) {
                 addEmployee();
                 break;
 
-            case "Update Employee Role":
-                updateEmpRole();
-                break;
+            case "Update Employee":
+
+                inquirer    
+                    .prompt(
+                        {
+                            name: "updateAction",
+                            type: "list",
+                            message: "Which UPDATE action would you like to perform?",
+                            choices: ["Update Employee's Role", "Update Employee's Manager"]
+                        }
+                    ).then(function(answer2) {
+
+                        switch (answer2.updateAction) {
+                        case "Update Employee's Role":
+                            updateEmpRole();
+                            break;
+                            
+                        case "Update Employee's Manager":
+                            updateEmpManager();
+                            break;
+                        }
+
+                    });
+                
+                break;      
 
             case "Exit 'Employees'":
                 startAction("What would you like to do now?");
@@ -113,14 +135,14 @@ function employeeAction(msgString) {
 function roleAction(msgString) {
 
     inquirer
-        .prompt({
-
-            name: "roleAction",
-            type: "list",
-            message: msgString,
-            choices: ["View All Roles", "Add Role", "Exit 'Roles'"]
-
-        }).then(function(answer) {
+        .prompt(
+            {
+                name: "roleAction",
+                type: "list",
+                message: msgString,
+                choices: ["View All Roles", "Add Role", "Exit 'Roles'"]
+            }
+        ).then(function(answer) {
 
             switch (answer.roleAction) {
             case "View All Roles":
@@ -143,14 +165,14 @@ function roleAction(msgString) {
 function departmentAction(msgString) {
 
     inquirer
-        .prompt({
-
-            name: "departmentAction",
-            type: "list",
-            message: msgString,
-            choices: ["View All Departments", "Add Department", "Exit 'Departments'"]
-
-        }).then(function(answer) {
+        .prompt(
+            {
+                name: "departmentAction",
+                type: "list",
+                message: msgString,
+                choices: ["View All Departments", "Add Department", "Exit 'Departments'"]
+            }
+        ).then(function(answer) {
 
             switch (answer.departmentAction) {
             case "View All Departments":
@@ -173,7 +195,7 @@ function departmentAction(msgString) {
 // EMPLOYEE QUERY FUNCTIONS
 // ----------------------------------------------------------------------------------------------------------------
 
-// viewEmployees();
+// Logs all employee data in table format in the console
 function viewEmployees() {
 
     connection.query(query.allEmployees, function(err, res) {
@@ -184,8 +206,7 @@ function viewEmployees() {
     });
 };
 
-// addEmployee(); 
-// TO DO: Simplify this code!!!!!
+// Prompts user for inputs to pass into an INSERT query for 'employees' table
 function addEmployee() {
 
     // Query for all roles
@@ -222,7 +243,7 @@ function addEmployee() {
                     {
                         name: "confirmManager",
                         type: "confirm",
-                        message: "Would you like assign a MANAGER for this employee?"
+                        message: "Would you like assign a manager for this employee?"
                     }, 
                     {
                         name: "manager",
@@ -240,6 +261,7 @@ function addEmployee() {
 
                     // Go through query response '1' (res1) again to find the object where the role title is equal to the role answer choice
                     let selectedRole = res1.find(obj => obj.title === answers.role);
+                    let roleID = selectedRole.id;
 
                     let managerID;
                     // Set the manager variable equal to NULL -or- equal to id of selected manager
@@ -253,8 +275,7 @@ function addEmployee() {
                     };
 
                     // Query to INSERT new employee values into employees data table
-                    // 'id' property value of 'selectedRole' object variable is specified when passed into query method 'addEmployee()'
-                    connection.query(query.addEmployee(firstName, lastName, selectedRole.id, managerID), function(err, res3) {
+                    connection.query(query.addEmployee(firstName, lastName, roleID, managerID), function(err, res3) {
 
                         console.log(`\n${firstName} ${lastName} was added to 'Employees'!`);
                         // Render updated employees table, and restart 'Employees' action prompts
@@ -266,7 +287,7 @@ function addEmployee() {
     });
 };
 
-// updateEmpRole();
+// Prompts user for inputs to pass into an UPDATE query for a specific 'role_id' column in 'employees' table
 function updateEmpRole() {
 
     // Query for all employees
@@ -300,13 +321,14 @@ function updateEmpRole() {
 
                     // Go through query response '1' (res1) again to find the object where the employee is equal to the employee answer choice
                     let selectedEmp = res1.find(obj => obj.employee === answers.employee);
+                    let empID = selectedEmp.id;
 
                     // Go through query response '2' (res2) again to find the object where the role title is equal to the role answer choice
                     let selectedRole = res2.find(obj => obj.title === answers.newRole);
+                    let roleID = selectedRole.id;
 
                     // Query to UPDATE selected employee's role in employees data table
-                    // 'id' property value of 'selectedRole' and 'selectedEmp' object variables is specified when passed into query method 'updateEmpRole()'
-                    connection.query(query.updateEmpRole(selectedRole.id, selectedEmp.id), function(err, res3) {
+                    connection.query(query.updateEmpRole(roleID, empID), function(err, res3) {
 
                         console.log(`\n${answers.employee}'s role was changed to '${answers.newRole}'!`);
                         // Render updated employees table, and restart 'Employees' action prompts
@@ -318,11 +340,92 @@ function updateEmpRole() {
     });
 };
 
+// Prompts user for inputs to pass into an UPDATE query for a specific 'manager_id' column in 'employees' table
+function updateEmpManager() {
+
+    // Query for all employees
+    connection.query(query.employees, function(err, res1) {
+
+        // make an array containing employee objects with only employee names
+        let employeesArr = res1.map(obj => obj.employee);
+
+        // Now we run inquirer, using the above array to plug in answer list choices
+        inquirer
+            .prompt([
+                {
+                    name: "employee",
+                    type: "list",
+                    message: "For which EMPLOYEE would you like to update manager data?",
+                    choices: employeesArr
+                },
+                {
+                    name: "managerAction",
+                    type: "list",
+                    message: "What manager update would you like to do?",
+                    choices: ["Change Manager", "Remove Manager"]
+                }
+            ]).then(function(answer1) {
+
+                // Go through query response '1' (res1) again to find...
+                // ...object where the employee is equal to the employee answer choice
+                let selectedEmp = res1.find(obj => obj.employee === answer1.employee);
+                let empID = selectedEmp.id
+
+                // Go through query response '1' (res1) again to filter and map...
+                // ... a managers array containing all employees names EXCEPT the selected employee
+                let managersArr = res1.filter(obj => obj.employee !== answer1.employee).map(obj => obj.employee);
+
+                if (answer1.managerAction === "Change Manager") {
+
+                    inquirer
+                    .prompt(
+                        {
+                            name: "newManager",
+                            type: "list",
+                            message: "Which MANAGER would you like to assign to this employee?",
+                            choices: managersArr
+                        }
+                    ).then(function(answer2) {
+                        
+                        // Go through query response '1' (res1) again to find...
+                        // ...object where the manager employee name is equal to the manager answer choice
+                        let selectedManager = res1.find(obj => obj.employee === answer2.newManager);
+                        let managerID = selectedManager.id;
+
+                        // Query to UPDATE selected employee's manager in employees data table
+                        connection.query(query.updateEmpManager(managerID, empID), function(err, res2) {
+
+                            console.log(`\n${answer1.employee}'s manager was changed to '${answer2.newManager}'!`);
+                            // Render updated employees table, and restart 'Employees' action prompts
+                            viewEmployees();
+
+                        })
+
+                    });
+
+                } else if (answer1.managerAction === "Remove Manager") {
+
+                    let managerID = null;
+
+                    // Query to UPDATE selected employee's manager in employees data table
+                    connection.query(query.updateEmpManager(managerID, empID), function(err, res2) {
+
+                        console.log(`\n${answer1.employee}'s manager was removed!`);
+                        // Render updated employees table, and restart 'Employees' action prompts
+                        viewEmployees();
+
+                    })
+
+                };
+            });
+    });
+};
+
 // ----------------------------------------------------------------------------------------------------------------
 // ROLE QUERY FUNCTIONS
 // ----------------------------------------------------------------------------------------------------------------
 
-// viewRoles()
+// Logs all role data in table format in the console
 function viewRoles() {
 
     connection.query(query.allRoles, function(err, res) {
@@ -333,7 +436,7 @@ function viewRoles() {
     });
 };
 
-// addRole();
+// Prompts user for inputs to pass into an INSERT query for 'roles' table
 function addRole() {
 
     // Query for all departments
@@ -368,10 +471,10 @@ function addRole() {
                 let salary = answers.salary;
                 // Go through query response '1' (res1) again to find the object where the department name is equal to the department answer choice
                 let selectedDept = res1.find(obj => obj.name === answers.department);
+                let deptID = selectedDept.id;
 
                 // Query to INSERT new role values into roles data table
-                // 'id' propery value of 'selectedDept' object variable is specified when passed into query method 'addRole()'
-                connection.query(query.addRole(title, salary, selectedDept.id), function(err, res2) {
+                connection.query(query.addRole(title, salary, deptID), function(err, res2) {
 
                     console.log(`\n${title} was added to 'Roles'!`);
                     // Render updated roles table, and restart 'Roles' action prompts
@@ -386,7 +489,7 @@ function addRole() {
 // DEPARTMENT QUERY FUNCTIONS
 // ----------------------------------------------------------------------------------------------------------------
 
-// viewDepartments();
+// Logs all department data in table format in the console
 function viewDepartments() {
 
     connection.query(query.allDepartments, function(err, res) {
@@ -397,7 +500,7 @@ function viewDepartments() {
     });
 };
 
-// addDepartment();
+// Prompts user for inputs to pass into an INSERT query for 'departments' table
 function addDepartment() {
 
     // Run inquirer

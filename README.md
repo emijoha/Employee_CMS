@@ -57,8 +57,7 @@ This application was built to make it easy for non-developers to manage a compan
 
 ## Upcoming Features
 
-Currently, updating data functionality is limited to employees' roles. I will be very soon adding more update functions. 
-Also, there is no data deletion functionality. That will be added in the near future!
+Currently, updating data is limited to employee roles and managers. Additional update functions are coming soon, as well as functionality for deleting data.
 
 ## License
 
