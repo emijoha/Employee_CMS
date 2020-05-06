@@ -4,7 +4,8 @@
 
 const inquirer = require("inquirer");
 const mysql = require("mysql");
-const cTable = require("console.table");
+const { printTable } = require('console-table-printer');
+
 
 // private password
 const password = require("./private/mysqlPassword");
@@ -200,7 +201,8 @@ function viewEmployees() {
 
     connection.query(query.allEmployees, function(err, res) {
 
-        console.table("\nAll Employees", res);
+        console.log("\n All Employees:");
+        printTable(res);
         employeeAction("What else would you like to do with 'Employees'?");
 
     });
@@ -430,7 +432,8 @@ function viewRoles() {
 
     connection.query(query.allRoles, function(err, res) {
 
-        console.table("\nAll Roles", res);
+        console.log("\n All Roles:");
+        printTable(res);
         roleAction("What else would you like to do with 'Roles'?");
 
     });
@@ -494,7 +497,8 @@ function viewDepartments() {
 
     connection.query(query.allDepartments, function(err, res) {
 
-        console.table("\nAll Departments", res);
+        console.log("\n All Departments:");
+        printTable(res);
         departmentAction("What else would you like to do with 'Departments'?");
 
     });

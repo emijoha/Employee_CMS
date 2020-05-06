@@ -9,9 +9,9 @@ A command-line application that allows the user to view and interact with employ
 
 This application uses Node and the following npm packages:
 
-* inquirer
-* console.table
 * mysql
+* inquirer
+* console-table-printer
 
 ## Table of Contents
 
