@@ -203,6 +203,7 @@ function viewEmployees() {
 
         console.log("\n All Employees:");
         printTable(res);
+        console.log("\n");
         employeeAction("What else would you like to do with 'Employees'?");
 
     });
@@ -434,6 +435,7 @@ function viewRoles() {
 
         console.log("\n All Roles:");
         printTable(res);
+        console.log("\n");
         roleAction("What else would you like to do with 'Roles'?");
 
     });
@@ -499,6 +501,7 @@ function viewDepartments() {
 
         console.log("\n All Departments:");
         printTable(res);
+        console.log("\n");
         departmentAction("What else would you like to do with 'Departments'?");
 
     });
